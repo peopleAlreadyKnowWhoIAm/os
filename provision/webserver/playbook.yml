@@ -1,0 +1,44 @@
+- name: Install and config webserver
+  hosts: webserver
+  become: true
+  tasks:
+    - name: Install php-fpm
+      apt:
+        name: php-fpm
+        state: present
+        update_cache: true
+    - name: Install and configure nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: true
+    - name: Copy data
+      copy:
+        src: nginx/test.php
+        dest: /var/www/html/info.php
+    - name: Copy nginx config
+      copy:
+        src: nginx/{{item}}
+        dest: /etc/nginx/{{item}}
+      loop:
+        - sites-available/site.conf
+        - snippets/self-signed.conf
+        - snippets/ssl-params.conf
+    - name: Disable default configuration
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
+    - name: Enable test configuration
+      file:
+        src: /etc/nginx/sites-available/site.conf
+        dest: /etc/nginx/sites-enabled/site.conf
+        state: link
+    - name: Generate SSL sertificate
+      script: ssl/certificate.sh
+      args:
+        creates: /etc/ssl/certs/nginx-selfsigned.crt
+    - name: Reload nginx
+      service:
+        name: nginx.service
+        state: reloaded

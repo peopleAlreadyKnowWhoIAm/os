@@ -1,0 +1,38 @@
+- name: Install and config MySQL
+  hosts: database
+  become: true
+  become_user: root
+  vars:
+    dbpass: sdjkj2@1-o(ds9}dsk1!
+    opencart_pass: dsj22js=kdks+kd_jwjdw1
+  tasks:
+    - name: Update APT cache
+      apt:
+        update_cache: true
+    - name: Install MySQL and needed libraries
+      apt:
+        name: "{{item}}"
+        state: present
+      with_items: 
+        - mysql-server
+        - mysql-client
+        - python3-pymysql
+    - name: Change root password
+      mysql_user:
+        name: root
+        password: "{{dbpass}}"
+        host: "localhost"
+        priv: "*.*:ALL,GRANT"
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+    - name: Copy root credentials for future logins
+      template:
+        src: mysql/my.cnf.j2
+        dest: /root/.my.cnf
+        owner: root
+        mode: '0400'
+    - name: Create opencart user
+      mysql_user:
+        name: opencart
+        password: "{{opencart_pass}}"
+        state: present
+        priv: "*.*:ALL"
