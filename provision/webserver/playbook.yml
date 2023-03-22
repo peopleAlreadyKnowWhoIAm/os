@@ -2,20 +2,48 @@
   hosts: webserver
   become: true
   tasks:
-    - name: Install php-fpm
+    - name: Update APT cache
       apt:
-        name: php-fpm
-        state: present
         update_cache: true
-    - name: Install and configure nginx
+    - name: Install software
       apt:
-        name: nginx
+        name: "{{item}}"
         state: present
-        update_cache: true
-    - name: Copy data
+      with_items: 
+        - php-fpm
+        - nginx
+        - git
+        - php-curl
+        - php-zip
+        - php-mysql
+        - php-gd
+    - name: Clone Opencart repo
+      git:
+        repo: 'https://github.com/opencart/opencart.git'
+        dest: /tmp/opencart
+    - name: Copy Opencart data
       copy:
-        src: nginx/test.php
-        dest: /var/www/html/info.php
+        src: /tmp/opencart/upload/
+        dest: /home/webroot/
+        remote_src: true
+        owner: www-data
+        mode: u+rwx
+    - name: Recopy file for Opencart configuration
+      copy:
+        remote_src: true
+        src: "/home/webroot/{{item}}-dist.php"
+        dest: "/home/webroot/{{item}}.php"
+        mode: a+rw,u+x
+      with_items: 
+        - admin/config
+        - config
+    - name: Delete old copy of opencart config
+      file:
+        state: absent
+        path: "/home/webrrot/{{item}}-dist.php"
+      with_items:
+        - config
+        - admin/config
     - name: Copy nginx config
       copy:
         src: nginx/{{item}}
@@ -28,7 +56,6 @@
       file:
         path: /etc/nginx/sites-enabled/default
         state: absent
-
     - name: Enable test configuration
       file:
         src: /etc/nginx/sites-available/site.conf
@@ -42,3 +69,4 @@
       service:
         name: nginx.service
         state: reloaded
+    

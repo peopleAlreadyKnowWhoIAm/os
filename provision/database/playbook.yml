@@ -30,9 +30,23 @@
         dest: /root/.my.cnf
         owner: root
         mode: '0400'
+    - name: Create opencart db
+      mysql_db:
+        name: opencart
+        state: present
     - name: Create opencart user
       mysql_user:
         name: opencart
         password: "{{opencart_pass}}"
+        host: '192.168.56.30'
         state: present
-        priv: "*.*:ALL"
+        priv: "opencart.*:ALL"
+    - name: Add remote binding
+      replace:
+        path: /etc/mysql/mysql.conf.d/mysqld.cnf
+        regexp: '^bind-address.*$'
+        replace: 'bind-address = 127.0.0.1,192.168.56.20'  
+    - name: Restart MySQL daemon
+      service:
+        name: mysql
+        state: restarted
