@@ -21,6 +21,8 @@
       git:
         repo: 'https://github.com/opencart/opencart.git'
         dest: /tmp/opencart
+        single_branch: yes
+        version: "4.0.1.1"
     - name: Copy Opencart data
       copy:
         src: /tmp/opencart/upload/
