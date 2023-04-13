@@ -43,7 +43,7 @@
         remote_src: true
         src: "/home/webroot/{{item}}-dist.php"
         dest: "/home/webroot/{{item}}.php"
-        mode: a+rw,u+x
+        mode: a=rw,u+x
       with_items: 
         - admin/config
         - config

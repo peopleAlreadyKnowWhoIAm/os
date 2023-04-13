@@ -1,5 +1,5 @@
-db_root_pass: sdjkj2@1-o(ds9}dsk1!
-db_opencart_user: opencart
-db_opencart_pass: dsj22js=kdks+kd_jwjdw1
-db_opencart_db: opencart
+db_root_pass: "sdjkj2@1-o(ds9}dsk1!"
+db_opencart_user: "opencart"
+db_opencart_pass: "dsj22js=kdks+kd_jwjdw1"
+db_opencart_db: "opencart"
 db_ip: "192.168.56.20"

@@ -35,7 +35,7 @@
         password: "{{db_opencart_pass}}"
         host: '192.168.56.30'
         state: present
-        priv: "opencart.*:ALL"
+        priv: "{{db_opencart_db}}.*:ALL"
     - name: Add remote binding
       replace:
         path: /etc/mysql/mysql.conf.d/mysqld.cnf
