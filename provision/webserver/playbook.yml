@@ -1,22 +1,16 @@
 - name: Install and config webserver
   hosts: webserver
   become: true
+  vars_files:
+    - "../vars.yml"
   tasks:
     - name: Update APT cache
       apt:
         update_cache: true
     - name: Install software
       apt:
-        name: "{{item}}"
+        name: ['php-fpm', 'nginx', 'git', 'php-curl', 'php-zip', 'php-mysql', 'php-gd']
         state: present
-      with_items: 
-        - php-fpm
-        - nginx
-        - git
-        - php-curl
-        - php-zip
-        - php-mysql
-        - php-gd
     - name: Clone Opencart repo
       git:
         repo: 'https://github.com/opencart/opencart.git'
@@ -28,6 +22,22 @@
         remote_src: true
         owner: www-data
         mode: u+rwx
+    - name: Delete Opencart left data
+      file:
+        path: /tmp/opencart
+        state: absent
+    
+    # - name: Copy Opencart configurations
+    #   template:
+    #     src: "opencart/{{item.src}}"
+    #     dest: "/home/webroot/{{item.dest}}"
+    #     owner: www-data
+    #     mode: u=rwx,g=rw,o=r
+    #   loop:
+    #     - {src: admconfig.php.j2, dest: admin/config.php}
+    #     - {src: config.php.j2, dest: config.php}
+
+
     - name: Recopy file for Opencart configuration
       copy:
         remote_src: true
@@ -40,7 +50,7 @@
     - name: Delete old copy of opencart config
       file:
         state: absent
-        path: "/home/webrrot/{{item}}-dist.php"
+        path: "/home/webroot/{{item}}-dist.php"
       with_items:
         - config
         - admin/config
@@ -48,23 +58,21 @@
       copy:
         src: nginx/{{item}}
         dest: /etc/nginx/{{item}}
-      loop:
+      with_items:
         - sites-available/site.conf
         - snippets/self-signed.conf
         - snippets/ssl-params.conf
-    - name: Disable default configuration
+    - name: Disable nginx default configuration
       file:
         path: /etc/nginx/sites-enabled/default
         state: absent
-    - name: Enable test configuration
+    - name: Enable nginx server configuration
       file:
         src: /etc/nginx/sites-available/site.conf
         dest: /etc/nginx/sites-enabled/site.conf
         state: link
     - name: Generate SSL sertificate
       script: ssl/certificate.sh
-      args:
-        creates: /etc/ssl/certs/nginx-selfsigned.crt
     - name: Reload nginx
       service:
         name: nginx.service

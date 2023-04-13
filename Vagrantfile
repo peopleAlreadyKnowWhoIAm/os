@@ -10,17 +10,21 @@ Vagrant.configure("2") do |config|
     vb.memory = "1024"
   end
 
-  config.vm.define "database" do |vma|
-    vma.vm.network "private_network", ip: "192.168.56.20"
+  config.vm.provision "telemetry", type: :ansible, playbook: "provision/playbook.yml"
+
+  config.vm.define "database" do |db|
+    db.vm.network "private_network", ip: "192.168.56.20"
+    db.vm.network "forwarded_port", guest: 9100, host:9110
     
-    vma.vm.provision :ansible, playbook: "provision/database/playbook.yml"
+    db.vm.provision :ansible, playbook: "provision/database/playbook.yml"
   end
-  config.vm.define "webserver" do |vmb|
-    vmb.vm.network "private_network", ip: "192.168.56.30"
-    vmb.vm.network "public_network", ip: "192.168.0.102"
+  config.vm.define "webserver" do |ws|
+    ws.vm.network "private_network", ip: "192.168.56.30"
+    ws.vm.network "public_network", ip: "192.168.0.102"
+    ws.vm.network "forwarded_port", guest: 9100, host: 9111
 
 
-    vmb.vm.provision "install", type: :ansible, playbook: "provision/webserver/playbook.yml"
+    ws.vm.provision "install", type: :ansible, playbook: "provision/webserver/playbook.yml"
   end
 
 end

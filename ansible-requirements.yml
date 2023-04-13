@@ -1,0 +1,3 @@
+# Usage: ansible-galaxy install -r ansible-requirements.yml  
+collections:
+  - prometheus.prometheus
