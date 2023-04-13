@@ -9,12 +9,14 @@
         update_cache: true
     - name: Install software
       apt:
-        name: ['php-fpm', 'nginx', 'git', 'php-curl', 'php-zip', 'php-mysql', 'php-gd']
+        name: ['php-fpm', 'nginx', 'git', 'php-curl', 'php-zip', 'php-mysql', 'php-gd', 'php-mbstring']
         state: present
     - name: Clone Opencart repo
       git:
         repo: 'https://github.com/opencart/opencart.git'
         dest: /tmp/opencart
+        single_branch: yes
+        version: "4.0.1.1"
     - name: Copy Opencart data
       copy:
         src: /tmp/opencart/upload/
@@ -27,17 +29,6 @@
         path: /tmp/opencart
         state: absent
     
-    # - name: Copy Opencart configurations
-    #   template:
-    #     src: "opencart/{{item.src}}"
-    #     dest: "/home/webroot/{{item.dest}}"
-    #     owner: www-data
-    #     mode: u=rwx,g=rw,o=r
-    #   loop:
-    #     - {src: admconfig.php.j2, dest: admin/config.php}
-    #     - {src: config.php.j2, dest: config.php}
-
-
     - name: Recopy file for Opencart configuration
       copy:
         remote_src: true
