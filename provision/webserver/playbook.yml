@@ -17,6 +17,7 @@
         - php-zip
         - php-mysql
         - php-gd
+        - php-mbstring
     - name: Clone Opencart repo
       git:
         repo: 'https://github.com/opencart/opencart.git'
