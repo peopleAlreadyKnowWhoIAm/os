@@ -12,4 +12,3 @@ services:
       - prometheus
     volumes:
       - ./docker/grafana-data:/var/lib/grafana
-    
