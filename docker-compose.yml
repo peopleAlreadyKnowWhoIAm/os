@@ -10,3 +10,6 @@ services:
       - '3000:3000'
     depends_on:
       - prometheus
+    volumes:
+      - ./docker/grafana-data:/var/lib/grafana
+    

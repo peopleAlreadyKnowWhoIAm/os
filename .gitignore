@@ -1,1 +1,3 @@
 .vagrant
+# docker/grafana-data/*
+__pycache__

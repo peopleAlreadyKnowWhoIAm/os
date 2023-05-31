@@ -19,6 +19,6 @@ scrape_configs:
       - targets: ['172.17.0.1:9111']
         labels:
             group: 'webserver'
-      - targets: ['172.18.0.1:9110']
+      - targets: ['172.17.0.1:9110']
         labels:
             group: 'database'
